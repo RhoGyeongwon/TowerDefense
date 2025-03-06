@@ -24,7 +24,7 @@ public class EnemySpawner : MonoBehaviour
             GameObject clone = Instantiate(enemyPrefab);
             Enemy enemy = clone.GetComponent<Enemy>();
 
-            enemy.Setup(enemy.gameObject, wayPoints);
+            enemy.Setup(this, wayPoints);
             enemyList.Add(enemy);
             SpawnEnemyHPSlider(clone); //일단여기추가
             yield return new WaitForSeconds(spawnTime);

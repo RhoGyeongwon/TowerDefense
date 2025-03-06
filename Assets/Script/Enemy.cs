@@ -9,14 +9,14 @@ public class Enemy : MonoBehaviour
     private Movement2D movement2D; //오브젝트 이동 제어
     private EnemySpawner enemySpawner;
     
-    public void Setup(GameObject enemy, Transform[] _wayPoints) // 초기 세팅
+    public void Setup(EnemySpawner _enemySpawner, Transform[] _wayPoints) // 초기 세팅
     {
         movement2D = GetComponent<Movement2D>();
-        
+        this.enemySpawner = _enemySpawner;
         wayPointCount = _wayPoints.Length;
         this.wayPoints = new Transform[wayPointCount]; // this.wayPoints = _wayPoints.ToArray();중 뭐가 좋을까? 그리고 new를 안해도 배열 대입 가능한데, 뭐가 제일 best지?
         this.wayPoints = _wayPoints;
-
+        
         transform.position = _wayPoints[currentIndex].position;
 
         StartCoroutine("OnMove");
@@ -61,8 +61,6 @@ public class Enemy : MonoBehaviour
             // 거리가 5라면 (5, 0, 0) → 크기(5)
             // 점점 크기가 작아지니까 속도가 느려지는 것처럼 보임.
             //     📌 결과: 목표점에 가까워질수록 점점 속도가 줄어들고 부드럽게 멈추는 것처럼 보임
-            Debug.Log("direction : " + direction);
-            Debug.Log("direction.normalized : " + direction.normalized);
             //공식 : vector3 / vector3의 길이
             movement2D.MoveTo(direction); //normalized로 정규화 안시키면 거리가 더 떨어져보이네.
         }

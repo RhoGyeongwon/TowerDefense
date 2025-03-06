@@ -3,10 +3,9 @@ using UnityEngine;
 
 public class EnemyHP : MonoBehaviour
 {
-    [SerializeField]
-    private float maxHP;         // 최대 체력
-    private float currentHP;      // 현재 체력
-    private bool isDie = false;   // 적이 사망 상태이면 isDie를 true로 설정
+    [SerializeField] private float maxHP; // 최대 체력
+    private float currentHP; // 현재 체력
+    private bool isDie = false; // 적이 사망 상태이면 isDie를 true로 설정
     private Enemy enemy;
     private SpriteRenderer spriteRenderer;
 
@@ -33,9 +32,11 @@ public class EnemyHP : MonoBehaviour
         StopCoroutine("HitAlphaAnimation");
         StartCoroutine("HitAlphaAnimation");
 
+        Debug.Log(currentHP);
         // 체력이 0이하 = 적 캐릭터 사망
         if (currentHP <= 0)
         {
+            Debug.Log("적 사망!");
             isDie = true;
             // 적 캐릭터 사망
             enemy.OnDie();
