@@ -14,6 +14,7 @@ public class Enemy : MonoBehaviour
     private int currentIndex = 0; //현재 목표지점 인덱스
     private Movement2D movement2D; //오브젝트 이동 제어
     private EnemySpawner enemySpawner;
+    private int gold = 10;
     
     public void Setup(EnemySpawner _enemySpawner, Transform[] _wayPoints) // 초기 세팅
     {
@@ -72,6 +73,7 @@ public class Enemy : MonoBehaviour
         }
         else
         {
+            gold = 0;
             OnDie(EnemyDestroyType.Arrive);
         }
     }
@@ -80,7 +82,7 @@ public class Enemy : MonoBehaviour
     {
         //EnemySpawner에서 리스트로 적 정보를 관리하기 때문에 Destroy()를 직접하지 않고
         //EnemySpawner에게 본인이 삭제될 때 필요한 처리를 하도록 DestroyEnemy() 함수 호출
-        enemySpawner.DestroyEnemy(type, this);
+        enemySpawner.DestroyEnemy(type, this, gold);
     }
 }
 

@@ -10,6 +10,7 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private float spawnTime;
     [SerializeField] private Transform[] wayPoints;
     [SerializeField] private PlayerHP playerHP;
+    [SerializeField] private PlayerGold playerGold;
     private List<Enemy> enemyList;
     public List<Enemy> EnemyList => enemyList;
     void Awake()
@@ -32,11 +33,15 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
-    public void DestroyEnemy(EnemyDestroyType type, Enemy enemy)
+    public void DestroyEnemy(EnemyDestroyType type, Enemy enemy, int gold)
     {
         if (type == EnemyDestroyType.Arrive)
         {
             playerHP.TakeDamage(1);
+        }
+        else if (type == EnemyDestroyType.Kill)
+        {
+            playerGold.CurrentGold += gold;
         }
         
         enemyList.Remove(enemy);
