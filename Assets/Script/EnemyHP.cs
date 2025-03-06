@@ -39,7 +39,7 @@ public class EnemyHP : MonoBehaviour
             Debug.Log("적 사망!");
             isDie = true;
             // 적 캐릭터 사망
-            enemy.OnDie();
+            enemy.OnDie(EnemyDestroyType.Kill);
         }
     }
     

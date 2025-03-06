@@ -9,6 +9,7 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private Transform canvasTransform;
     [SerializeField] private float spawnTime;
     [SerializeField] private Transform[] wayPoints;
+    [SerializeField] private PlayerHP playerHP;
     private List<Enemy> enemyList;
     public List<Enemy> EnemyList => enemyList;
     void Awake()
@@ -31,8 +32,13 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
-    public void DestroyEnemy(Enemy enemy)
+    public void DestroyEnemy(EnemyDestroyType type, Enemy enemy)
     {
+        if (type == EnemyDestroyType.Arrive)
+        {
+            playerHP.TakeDamage(1);
+        }
+        
         enemyList.Remove(enemy);
         Destroy(enemy.gameObject);
     }
