@@ -3,6 +3,7 @@ using UnityEngine;
 public class ObjectDetecter : MonoBehaviour
 {
     [SerializeField] private TowerSpawner towerSpawner;
+    [SerializeField] private TowerDataViewer towerDataViewer;
     private Camera mainCamera;
     private Ray ray;
     private RaycastHit hit;
@@ -26,10 +27,14 @@ public class ObjectDetecter : MonoBehaviour
                 // 길이를 조정할 수 있다.
             {
                     // 광선에 부딪힌 오브젝트의 태그가 "Tile"이면
-                if (hit.transform.tag == "Tile")
+                if (hit.transform.CompareTag("Tile"))
                 {
                     // 타워가 생성하는 SpawnTower() 호출
                     towerSpawner.SpawnTower(hit.transform);
+                }
+                else if (hit.transform.CompareTag("Tower"))
+                {
+                    towerDataViewer.OnPanel(hit.transform);
                 }
             }
         }

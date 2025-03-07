@@ -9,12 +9,12 @@ public enum EnemyDestroyType
 
 public class Enemy : MonoBehaviour
 {
+    [SerializeField] private int gold = 10;
     private int wayPointCount; //이동 경로 갯수
     private Transform[] wayPoints; //이동 경로 정보
     private int currentIndex = 0; //현재 목표지점 인덱스
     private Movement2D movement2D; //오브젝트 이동 제어
     private EnemySpawner enemySpawner;
-    private int gold = 10;
     
     public void Setup(EnemySpawner _enemySpawner, Transform[] _wayPoints) // 초기 세팅
     {

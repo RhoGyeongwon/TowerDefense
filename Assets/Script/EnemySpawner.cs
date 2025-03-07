@@ -4,32 +4,47 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    [SerializeField] private GameObject enemyPrefab;
+    //[SerializeField] private GameObject enemyPrefab;
     [SerializeField] private GameObject enemyHPSliderPrefab;
     [SerializeField] private Transform canvasTransform;
-    [SerializeField] private float spawnTime;
+    //[SerializeField] private float spawnTime;
     [SerializeField] private Transform[] wayPoints;
     [SerializeField] private PlayerHP playerHP;
     [SerializeField] private PlayerGold playerGold;
+    private Wave currentWave;
+    private int currentEnemyCount;
     private List<Enemy> enemyList;
     public List<Enemy> EnemyList => enemyList;
+    public int CurrentEnemyCount => currentEnemyCount;
+    public int MaxEnemyCount => currentWave.maxEnemyCount;
     void Awake()
     {
         enemyList = new List<Enemy>();
-        StartCoroutine("SpawnEnemy");
+        //StartCoroutine("SpawnEnemy");
     }
 
+    public void StartWave(Wave wave)
+    {
+        currentWave = wave;
+        currentEnemyCount = currentWave.maxEnemyCount;
+        StartCoroutine("SpawnEnemy");
+    }
     private IEnumerator SpawnEnemy()
     {
-        while (true)
+        int spawnEnemyCount = 0;
+        //while (true)
+        while (spawnEnemyCount < currentWave.maxEnemyCount)
         {
-            GameObject clone = Instantiate(enemyPrefab);
+            int enemyIndex = Random.Range(0, currentWave.enemyPrefabs.Length);
+            GameObject clone = Instantiate(currentWave.enemyPrefabs[enemyIndex]);
             Enemy enemy = clone.GetComponent<Enemy>();
 
             enemy.Setup(this, wayPoints);
             enemyList.Add(enemy);
             SpawnEnemyHPSlider(clone); //일단여기추가
-            yield return new WaitForSeconds(spawnTime);
+
+            ++spawnEnemyCount;
+            yield return new WaitForSeconds(currentWave.spawnTime);
         }
     }
 
@@ -43,7 +58,8 @@ public class EnemySpawner : MonoBehaviour
         {
             playerGold.CurrentGold += gold;
         }
-        
+
+        currentEnemyCount--;
         enemyList.Remove(enemy);
         Destroy(enemy.gameObject);
     }

@@ -17,7 +17,13 @@ public class TowerWeapon : MonoBehaviour
     private WeaponState weaponState = WeaponState.SearchTarget;
     private Transform attackTarget = null;
     private EnemySpawner enemySpawner;
+    private int level = 0;
 
+    public float Damage => attackDamage;
+    public float Rate => attackRate;
+    public float Range => attackRange;
+    public int Level => level + 1;
+    
     public void Setup(EnemySpawner _enemySpawner)
     {
         this.enemySpawner = _enemySpawner;
