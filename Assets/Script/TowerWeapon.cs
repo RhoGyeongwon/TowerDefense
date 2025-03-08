@@ -9,24 +9,38 @@ public enum WeaponState
 
 public class TowerWeapon : MonoBehaviour
 {
+    [SerializeField] private TowerTemplate towerTemplate;
     [SerializeField] private GameObject projectilePrefab;
     [SerializeField] private Transform spawnPoint;
-    [SerializeField] private float attackRate = 0.5f;
-    [SerializeField] private float attackRange = 2.0f;
-    [SerializeField] private int attackDamage = 1;
+    // [SerializeField] private float attackRate = 0.5f;
+    // [SerializeField] private float attackRange = 2.0f;
+    // [SerializeField] private int attackDamage = 1;
     private WeaponState weaponState = WeaponState.SearchTarget;
     private Transform attackTarget = null;
     private EnemySpawner enemySpawner;
     private int level = 0;
-
-    public float Damage => attackDamage;
-    public float Rate => attackRate;
-    public float Range => attackRange;
+    private SpriteRenderer spriteRenderer;
+    private PlayerGold playerGold;
+    private Tile ownerTile;
+    
+    public Sprite TowerSprite => towerTemplate.weapon[level].sprite;
+    public float Damage => towerTemplate.weapon[level].damage;
+    public float Rate => towerTemplate.weapon[level].rate;
+    public float Range => towerTemplate.weapon[level].range;
+    public int MaxLevel => towerTemplate.weapon.Length;
+    
+    // public float Damage => attackDamage;
+    // public float Rate => attackRate;
+    // public float Range => attackRange;
     public int Level => level + 1;
     
-    public void Setup(EnemySpawner _enemySpawner)
+    public void Setup(EnemySpawner _enemySpawner, PlayerGold _playerGold, Tile _ownerTile)
     {
+        spriteRenderer = GetComponent<SpriteRenderer>();
         this.enemySpawner = _enemySpawner;
+        this.playerGold = _playerGold;
+        this.ownerTile = _ownerTile;
+        
         ChangeState(WeaponState.SearchTarget); //최초 상태를 WeaponState.SearchTarget으로 설정
     }
 
@@ -70,7 +84,8 @@ public class TowerWeapon : MonoBehaviour
                 float distance = Vector3.Distance(enemySpawner.EnemyList[i].transform.position, transform.position);
                 
                 // 현재 검사중인 적과의 거리가 공격범위 내에 있고, 현재까지 검사한 적보다 거리가 가까우면
-                if (distance < attackRange && distance <= closestDistSqr)
+                //if (distance <= attackRange && distance <= closestDistSqr)
+                if (distance <= towerTemplate.weapon[level].range && distance <= closestDistSqr)
                 {
                     closestDistSqr = distance;
                     attackTarget = enemySpawner.EnemyList[i].transform;
@@ -97,14 +112,16 @@ public class TowerWeapon : MonoBehaviour
             }
             
             float distance = Vector3.Distance(attackTarget.position, transform.position);
-            if (distance > attackRange)
+            //if (distance > attackRange)
+            if (distance > towerTemplate.weapon[level].range)
             {
                 attackTarget = null;
                 ChangeState(WeaponState.SearchTarget);
                 break;
             }
 
-            yield return new WaitForSeconds(attackRate);
+            //yield return new WaitForSeconds(attackRate);
+            yield return new WaitForSeconds(towerTemplate.weapon[level].rate);
             SpawnProjectile();
         }
     }
@@ -112,6 +129,39 @@ public class TowerWeapon : MonoBehaviour
     private void SpawnProjectile()
     {
         GameObject clone = Instantiate(projectilePrefab, spawnPoint.position, Quaternion.identity);
-        clone.GetComponent<Projectile>().Setup(attackTarget, attackDamage);
+        //clone.GetComponent<Projectile>().Setup(attackTarget, attackDamage);
+        clone.GetComponent<Projectile>().Setup(attackTarget, towerTemplate.weapon[level].damage);
+    }
+    
+    public bool Upgrade()
+    {
+        // 타워 업그레이드에 필요한 골드가 충분한지 검사
+        if (playerGold.CurrentGold < towerTemplate.weapon[level + 1].cost)
+        {
+            return false; // 골드가 부족하면 업그레이드 불가
+        }
+
+        // 타워 레벨 증가
+        level++;
+
+        // 타워 외형 변경 (Sprite)
+        spriteRenderer.sprite = towerTemplate.weapon[level].sprite;
+
+        // 골드 차감
+        playerGold.CurrentGold -= towerTemplate.weapon[level].cost;
+
+        return true; // 업그레이드 성공
+    }
+    
+    public void Sell()
+    {
+        // 골드 증가
+        playerGold.CurrentGold += towerTemplate.weapon[level].sell;
+
+        // 현재 타일에 다시 타워 건설이 가능하도록 설정
+        ownerTile.IsBuildTower = false;
+
+        // 타워 파괴
+        Destroy(gameObject);
     }
 }

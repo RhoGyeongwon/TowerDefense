@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5484f3e27fcf8be41b0fb5b3d215f7c7, type: 3}
+  m_Name: Tower Template
+  m_EditorClassIdentifier: 
+  towerPrefab: {fileID: 7790426892211589726, guid: f1c806f24b0945846812a7762de90c83, type: 3}
+  weapon:
+  - sprite: {fileID: 21300000, guid: a39038bf2ebed394b81f5b1549ec0175, type: 3}
+    damage: 1
+    rate: 0.5
+    range: 2
+    cost: 50
+    sell: 25
+  - sprite: {fileID: 21300000, guid: 62a490b5a520ec74ead3b6b43c90ea3a, type: 3}
+    damage: 1.5
+    rate: 0.4
+    range: 2.3
+    cost: 100
+    sell: 75
+  - sprite: {fileID: 21300000, guid: 0dc20fb65c3926e4285471825af74c26, type: 3}
+    damage: 2
+    rate: 0.3
+    range: 2.5
+    cost: 150
+    sell: 150
