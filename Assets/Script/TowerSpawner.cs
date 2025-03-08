@@ -8,16 +8,36 @@ public class TowerSpawner : MonoBehaviour
     [SerializeField] private EnemySpawner enemySpawner;
     [SerializeField] private PlayerGold playerGold;
     [SerializeField] private SystemTextViewer systemTextViewer;
-
-    public void SpawnTower(Transform tileTransform)
+    private bool isOnTowerButton = false; //타워 건설 버튼을 눌렀는지 체크
+    
+    public void ReadyToSpawnTower()
     {
-        //if (towerBuildGold > playerGold.CurrentGold)
+        // 타워 건설 가능 여부 확인
+        // 타워를 건설할 만큼 돈이 없으면 타워 건설 X
         if (towerTemplate.weapon[0].cost > playerGold.CurrentGold)
         {
-            //골드가 부족해서 타워 건설이 불가능하다고 출력
+            // 골드가 부족해서 타워 건설이 불가능하다고 출력
             systemTextViewer.PrintText(SystemType.Money);
             return;
         }
+
+        // 타워 건설 버튼을 눌렀다고 설정
+        isOnTowerButton = true;
+    }
+
+    public void SpawnTower(Transform tileTransform)
+    {
+        if (isOnTowerButton == false)
+        {
+            return;
+        }
+        //if (towerBuildGold > playerGold.CurrentGold)
+        // if (towerTemplate.weapon[0].cost > playerGold.CurrentGold)
+        // {
+        //     //골드가 부족해서 타워 건설이 불가능하다고 출력
+        //     systemTextViewer.PrintText(SystemType.Money);
+        //     return;
+        // }
         
         Tile tile = tileTransform.GetComponent<Tile>();
 
@@ -28,6 +48,7 @@ public class TowerSpawner : MonoBehaviour
             return;
         }
         
+        isOnTowerButton = false; // 다시 타워 건설 버튼을 눌러서 타워를 건설하도록 변수 설정
         tile.IsBuildTower = true;
         //playerGold.CurrentGold -= towerBuildGold;
         playerGold.CurrentGold -= towerTemplate.weapon[0].cost;
