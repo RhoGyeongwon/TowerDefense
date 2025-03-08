@@ -4,6 +4,7 @@ using UnityEngine;
 public class TowerTemplate : ScriptableObject
 {
     public GameObject towerPrefab; // 타워 생성을 위한 프리팹
+    public GameObject followTowerPrefab;
     public Weapon[] weapon; // 레벨별 타워(무기) 정보
 
     [System.Serializable] //유니티에서 구조체(struct)나 클래스를 "인스펙터에서 보이게" 해주는 기능

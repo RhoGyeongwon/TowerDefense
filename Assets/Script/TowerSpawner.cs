@@ -9,9 +9,15 @@ public class TowerSpawner : MonoBehaviour
     [SerializeField] private PlayerGold playerGold;
     [SerializeField] private SystemTextViewer systemTextViewer;
     private bool isOnTowerButton = false; //타워 건설 버튼을 눌렀는지 체크
+    private GameObject followTowerClone = null;
     
     public void ReadyToSpawnTower()
     {
+        if (isOnTowerButton == true) //버튼을 중복해서 누르는 것을 방지하기 위해 필요
+        {
+            return;
+        }
+        
         // 타워 건설 가능 여부 확인
         // 타워를 건설할 만큼 돈이 없으면 타워 건설 X
         if (towerTemplate.weapon[0].cost > playerGold.CurrentGold)
@@ -23,6 +29,8 @@ public class TowerSpawner : MonoBehaviour
 
         // 타워 건설 버튼을 눌렀다고 설정
         isOnTowerButton = true;
+        // 마우스를 따라다니는 임시 타워 생성
+        followTowerClone = Instantiate(towerTemplate.followTowerPrefab);
     }
 
     public void SpawnTower(Transform tileTransform)
@@ -57,5 +65,7 @@ public class TowerSpawner : MonoBehaviour
         GameObject towerClone = Instantiate(towerTemplate.towerPrefab, position, Quaternion.identity);
         //towerClone.GetComponent<TowerWeapon>().Setup(enemySpawner);
         towerClone.GetComponent<TowerWeapon>().Setup(enemySpawner, playerGold, tile);
+        
+        Destroy(followTowerClone); // 타워를 제거했기 때문에 마우스를 따라다니느 임시 타워 삭제
     }
 }
