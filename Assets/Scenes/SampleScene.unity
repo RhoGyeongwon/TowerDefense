@@ -2228,7 +2228,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 060d5d086643739479e9db739d03dd4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentGold: 200
+  currentGold: 1000
 --- !u!1001 &271857880
 PrefabInstance:
   m_ObjectHideFlags: 0

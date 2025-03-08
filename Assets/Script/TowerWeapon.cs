@@ -4,12 +4,14 @@ using UnityEngine;
 
 public enum WeaponType
 {
-    Cannon
+    Cannon,
+    Laser
 }
 public enum WeaponState
 {
     SearchTarget = 0,
-    TryAttackCannon
+    TryAttackCannon,
+    TryAttackLaser
     //AttackToTarget
 }
 
@@ -28,6 +30,11 @@ public class TowerWeapon : MonoBehaviour
     
     [Header("Cannon")]
     [SerializeField] private GameObject projectilePrefab;
+    
+    [Header("Laser")]
+    [SerializeField] private LineRenderer lineRenderer; // 레이저로 사용되는 선 (LineRenderer)
+    [SerializeField] private Transform hitEffect; // 타격 효과
+    [SerializeField] private LayerMask targetLayer; // 광선에 부딪히는 레이어 설정
     
     private int level = 0;
     private SpriteRenderer spriteRenderer;
@@ -107,8 +114,14 @@ public class TowerWeapon : MonoBehaviour
             
             if (attackTarget != null)
             {
-                //ChangeState(WeaponState.AttackToTarget);
-                ChangeState(WeaponState.TryAttackCannon);
+                if (weaponType == WeaponType.Cannon)
+                {
+                    ChangeState(WeaponState.TryAttackCannon);
+                }
+                else if (weaponType == WeaponType.Laser)
+                {
+                    ChangeState(WeaponState.TryAttackLaser);
+                }
             }
             
             yield return null;
@@ -170,6 +183,29 @@ public class TowerWeapon : MonoBehaviour
         }
     }
 
+    private IEnumerator TryAttackLaser()
+    {
+        // 레이저, 레이저 타격 효과 활성화
+        EnableLaser();
+
+        while (true)
+        {
+            // target을 공격할 수 있는지 검사
+            if (IsPossibleToAttackTarget() == false)
+            {
+                // 레이저, 레이저 타격 효과 비활성화
+                DisableLaser();
+                ChangeState(WeaponState.SearchTarget);
+                break;
+            }
+
+            // 레이저 공격
+            SpawnLaser();
+
+            yield return null;
+        }
+    }
+
     private Transform FindClosestAttackTarget()
     {
         // 제일 가까이 있는 적을 찾기 위해 최초 거리를 최대한 크게 설정
@@ -218,6 +254,49 @@ public class TowerWeapon : MonoBehaviour
         clone.GetComponent<Projectile>().Setup(attackTarget, towerTemplate.weapon[level].damage);
     }
     
+    private void EnableLaser()
+    {
+        // 레이저 선과 타격 효과 활성화
+        lineRenderer.gameObject.SetActive(true);
+        hitEffect.gameObject.SetActive(true);
+    }
+
+    private void DisableLaser()
+    {
+        // 레이저 선과 타격 효과 비활성화
+        lineRenderer.gameObject.SetActive(false);
+        hitEffect.gameObject.SetActive(false);
+    }
+
+    private void SpawnLaser()
+    {
+        // 레이저 방향 벡터 설정 (공격 대상 - 발사 위치)
+        Vector3 direction = attackTarget.position - spawnPoint.position;
+
+        // 2D 물리 레이캐스트 실행 (발사 위치에서 지정된 방향으로 광선을 발사하여 충돌 감지)
+        RaycastHit2D[] hit = Physics2D.RaycastAll(spawnPoint.position, direction, 
+            towerTemplate.weapon[level].range, targetLayer);
+
+        // 같은 방향으로 여러 개의 광선을 쏴서 그중 현재 attackTarget과 동일한 오브젝트를 찾음
+        for (int i = 0; i < hit.Length; i++)
+        {
+            if (hit[i].transform == attackTarget)
+            {
+                // 레이저 선의 시작 위치 설정 (발사 위치)
+                lineRenderer.SetPosition(0, spawnPoint.position);
+
+                // 레이저 선의 목표 지점 설정 (충돌한 위치)
+                lineRenderer.SetPosition(1, new Vector3(hit[i].point.x, hit[i].point.y, 0) + Vector3.back);
+
+                // 타격 효과 위치 설정
+                hitEffect.position = hit[i].point;
+
+                // 적 체력 감소 (1초에 damage 값만큼 감소)
+                attackTarget.GetComponent<EnemyHP>().TakeDamage(towerTemplate.weapon[level].damage * Time.deltaTime);
+            }
+        }
+    }
+
     public bool Upgrade()
     {
         // 타워 업그레이드에 필요한 골드가 충분한지 검사
@@ -234,6 +313,14 @@ public class TowerWeapon : MonoBehaviour
 
         // 골드 차감
         playerGold.CurrentGold -= towerTemplate.weapon[level].cost;
+
+        // 무기 속성이 레이저이면
+        if (weaponType == WeaponType.Laser)
+        {
+            // 레벨에 따라 레이저의 굵기 설정
+            lineRenderer.startWidth = 0.05f + level * 0.05f; // 시작 지점의 굵기
+            lineRenderer.endWidth = 0.05f; // 끝 지점의 굵기
+        }
 
         return true; // 업그레이드 성공
     }
