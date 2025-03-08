@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class TowerSpawner : MonoBehaviour
@@ -31,6 +32,7 @@ public class TowerSpawner : MonoBehaviour
         isOnTowerButton = true;
         // 마우스를 따라다니는 임시 타워 생성
         followTowerClone = Instantiate(towerTemplate.followTowerPrefab);
+        StartCoroutine("OnTowerCancelSystem");
     }
 
     public void SpawnTower(Transform tileTransform)
@@ -67,5 +69,24 @@ public class TowerSpawner : MonoBehaviour
         towerClone.GetComponent<TowerWeapon>().Setup(enemySpawner, playerGold, tile);
         
         Destroy(followTowerClone); // 타워를 제거했기 때문에 마우스를 따라다니느 임시 타워 삭제
+        StartCoroutine("OnTowerCancelSystem");
+    }
+    
+    private IEnumerator OnTowerCancelSystem()
+    {
+        while (true)
+        {
+            // ESC 키 또는 마우스 오른쪽 버튼을 눌렀을 때 타워 건설 취소
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1))
+            {
+                isOnTowerButton = false;
+
+                // 마우스를 따라다니는 임시 타워 삭제
+                Destroy(followTowerClone);
+                break;
+            }
+
+            yield return null;
+        }
     }
 }
